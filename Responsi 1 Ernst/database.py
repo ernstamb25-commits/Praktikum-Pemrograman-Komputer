@@ -3,7 +3,6 @@ import sqlite3
 DB_NAME = "pengeluaran.db"
 
 def init_db():
-    """Membuat tabel jika belum ada."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute("""
@@ -19,7 +18,6 @@ def init_db():
     conn.close()
 
 def add_expense(date, category, amount, description):
-    """Menambahkan data baru."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute("INSERT INTO expenses (date, category, amount, description) VALUES (?, ?, ?, ?)",
@@ -28,7 +26,6 @@ def add_expense(date, category, amount, description):
     conn.close()
 
 def fetch_expenses():
-    """Mengambil semua data untuk ditampilkan."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM expenses ORDER BY date DESC")
@@ -37,9 +34,20 @@ def fetch_expenses():
     return rows
 
 def delete_expense(expense_id):
-    """Menghapus data berdasarkan ID."""
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()
     cursor.execute("DELETE FROM expenses WHERE id=?", (expense_id,))
+    conn.commit()
+    conn.close()
+
+# --- FITUR BARU: Update Data ---
+def update_expense(row_id, date, category, amount, description):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE expenses 
+        SET date=?, category=?, amount=?, description=? 
+        WHERE id=?
+    """, (date, category, amount, description, row_id))
     conn.commit()
     conn.close()
